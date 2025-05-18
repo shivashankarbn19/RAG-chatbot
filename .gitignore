@@ -24,9 +24,6 @@ venv/
 ENV/
 env/
 
-# Streamlit
-.streamlit/secrets.toml
-
 # IDE
 .idea/
 .vscode/
@@ -37,7 +34,10 @@ env/
 .DS_Store
 Thumbs.db
 
-# Node.js (explicitly exclude)
-node_modules/
-package.json
-package-lock.json
+# Application specific
+uploads/
+vector_stores/
+chat_history/
+
+# Environment variables
+.env

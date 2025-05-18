@@ -1,6 +1,6 @@
-# RAG Chatbot with Streamlit
+# RAG Chatbot with Flask
 
-This is a Retrieval Augmented Generation (RAG) chatbot built with Streamlit, LangChain, and OpenAI. The chatbot allows users to upload documents (PDF, TXT) and ask questions about their content.
+This is a Retrieval Augmented Generation (RAG) chatbot built with Flask, LangChain, and OpenAI. The chatbot allows users to upload documents (PDF, TXT) and ask questions about their content.
 
 ## Features
 
@@ -8,6 +8,7 @@ This is a Retrieval Augmented Generation (RAG) chatbot built with Streamlit, Lan
 - Ask questions about the uploaded documents
 - Get accurate answers based on the document content
 - Conversation history tracking
+- Simple and intuitive web interface
 
 ## Requirements
 
@@ -23,24 +24,47 @@ This is a Retrieval Augmented Generation (RAG) chatbot built with Streamlit, Lan
    \`\`\`
 3. Run the app locally:
    \`\`\`
-   streamlit run app.py
+   python app.py
+   \`\`\`
+4. Open your browser and navigate to `http://localhost:5000`
+
+## Deployment Options
+
+### Heroku
+
+1. Create a Heroku account if you don't have one
+2. Install the Heroku CLI
+3. Login to Heroku CLI:
+   \`\`\`
+   heroku login
+   \`\`\`
+4. Create a new Heroku app:
+   \`\`\`
+   heroku create your-app-name
+   \`\`\`
+5. Deploy to Heroku:
+   \`\`\`
+   git push heroku main
    \`\`\`
 
-## Deployment on Streamlit Cloud
+### Vercel
 
-1. Fork this repository to your GitHub account
-2. Go to [Streamlit Cloud](https://streamlit.io/cloud)
-3. Sign in with your GitHub account
-4. Click "New app"
-5. Select this repository and the main file (app.py)
-6. Deploy the app
+1. Install Vercel CLI:
+   \`\`\`
+   npm install -g vercel
+   \`\`\`
+2. Deploy to Vercel:
+   \`\`\`
+   vercel
+   \`\`\`
 
-## Usage
+### Render
 
-1. Enter your OpenAI API key in the sidebar
-2. Upload one or more documents (PDF or TXT)
-3. Click "Process Documents"
-4. Start asking questions about your documents
+1. Create a Render account
+2. Create a new Web Service
+3. Connect your GitHub repository
+4. Set the build command to `pip install -r requirements.txt`
+5. Set the start command to `gunicorn app:app`
 
 ## How it Works
 
@@ -51,9 +75,21 @@ This chatbot uses Retrieval Augmented Generation (RAG):
 3. Embeddings are stored in a FAISS vector database
 4. When a question is asked, the most relevant chunks are retrieved
 5. The LLM generates an answer based on the retrieved information
+
+## Project Structure
+
+- `app.py`: Main Flask application
+- `templates/index.html`: HTML template for the web interface
+- `uploads/`: Directory for uploaded files
+- `vector_stores/`: Directory for storing FAISS vector databases
+- `chat_history/`: Directory for storing chat history
+
+## License
+
+MIT
 \`\`\`
 
-Let's also create a .gitignore file:
+Let's create a .gitignore file:
 
 ```txt file=".gitignore" type="code"
 # Python
@@ -62,7 +98,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -83,9 +118,6 @@ venv/
 ENV/
 env/
 
-# Streamlit
-.streamlit/
-
 # IDE
 .idea/
 .vscode/
@@ -95,3 +127,11 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# Application specific
+uploads/
+vector_stores/
+chat_history/
+
+# Environment variables
+.env
