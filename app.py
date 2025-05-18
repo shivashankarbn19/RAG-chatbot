@@ -5,13 +5,14 @@ import openai
 from langchain.document_loaders import PyPDFLoader, TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
+from langchain.vectorstores import DocArrayInMemorySearch  # Replace FAISS with DocArrayInMemorySearch
 import tempfile
 import uuid
 import json
+import pickle
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -41,7 +42,7 @@ def get_vector_store_path(session_id):
     vector_stores_dir = 'vector_stores'
     if not os.path.exists(vector_stores_dir):
         os.makedirs(vector_stores_dir)
-    return os.path.join(vector_stores_dir, f"{session_id}.faiss")
+    return os.path.join(vector_stores_dir, f"{session_id}.pkl")
 
 def get_chat_history_path(session_id):
     chat_history_dir = 'chat_history'
@@ -92,8 +93,12 @@ def process_documents(files, api_key):
     session_id = get_session_id()
     vector_store_path = get_vector_store_path(session_id)
     
-    vectorstore = FAISS.from_documents(document_chunks, embeddings)
-    vectorstore.save_local(vector_store_path)
+    # Use DocArrayInMemorySearch instead of FAISS
+    vectorstore = DocArrayInMemorySearch.from_documents(document_chunks, embeddings)
+    
+    # Save the vectorstore
+    with open(vector_store_path, 'wb') as f:
+        pickle.dump(vectorstore, f)
     
     return True
 
@@ -105,8 +110,10 @@ def get_conversation_chain(api_key):
         return None
     
     openai.api_key = api_key
-    embeddings = OpenAIEmbeddings(openai_api_key=api_key)
-    vectorstore = FAISS.load_local(vector_store_path, embeddings)
+    
+    # Load the vectorstore
+    with open(vector_store_path, 'rb') as f:
+        vectorstore = pickle.load(f)
     
     llm = ChatOpenAI(
         model_name="gpt-3.5-turbo", 
@@ -177,7 +184,7 @@ def chat():
         history = load_chat_history(session_id)
         history.append({'role': 'user', 'content': question})
         history.append({'role': 'assistant', 'content': answer})
-        save_chat_history(session_id)
+        save_chat_history(session_id, history)
         
         return jsonify({'answer': answer})
     except Exception as e:
